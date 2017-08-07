@@ -23,14 +23,19 @@ node {
         if (fileExists("status")) {
             sh "rm status"
         }
+        
+        // grab the appropriate state from object storage
         sh "bmcs os object get -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
         sh "terraform get"
         
+        // direct terraform to destroy the environment
         sh "terraform init"
         sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=jenkins.tfvars"
 
+        // clean up object storage
         sh "bmcs os object delete -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --force"
         sh "bmcs os bucket delete -ns verizonwireline --name $Environment_Identifier --force"
+        
         currentBuild.result = 'SUCCESS'   
         }
            

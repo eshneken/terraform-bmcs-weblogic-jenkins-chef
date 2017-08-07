@@ -17,10 +17,6 @@ node {
         sh "sudo rm /usr/local/bin/terraform"
         sh "sudo ln -s /home/opc/terraform /usr/local/bin/terraform"
         sh "cp /home/opc/terraform-provider-baremetal ."
-        
-        // Output Terraform version
-        sh "terraform init"
-        sh "terraform --version"
 
         //Remove the terraform state file so we always start from a clean state
         if (fileExists("./terraform.tfstate")) {
@@ -34,8 +30,12 @@ node {
             sh "rm status"
         }
 
+        // Init Terraform
+        sh "terraform init"
+        sh "terraform --version"
+        
+        // build the plan
         sh "set +e; terraform plan -var-file=jenkins.tfvars -var region=$Region -var identifier=$Environment_Identifier -var ad=$Availability_Domain -out=plan.out -detailed-exitcode; echo \$? > status"
-
 
         def exitCode = readFile('status').trim()
         def apply = false
