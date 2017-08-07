@@ -11,7 +11,8 @@ node {
 
     dir('terraform') {
     
-        sh "PATH=$PATH:/home/opc:.; export PATH"
+        sh "cp /home/opc/terraform ."
+        sh "cp /home/opc/terraform-provider-baremetal ."
         
         // Output Terraform version
         sh "terraform init"
