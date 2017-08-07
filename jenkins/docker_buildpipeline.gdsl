@@ -6,72 +6,68 @@ node {
     // Get some code from a GitHub repository
     git credentialsId: 'GitHub', url: 'https://eshneken@github.com/eshneken/terraform-bmcs-weblogic-jenkins-chef.git'
 
-    wrap([$class: 'AnsiColorBuildWrapper']) {
+    // Mark the code build 'plan'....
+    stage name: 'Plan', concurrency: 1
 
-        // Mark the code build 'plan'....
-        stage name: 'Plan', concurrency: 1
-        
-        dir('terraform') {
-            // Output Terraform version
-            sh "terraform --version"
-            
-            //Remove the terraform state file so we always start from a clean state
-            if (fileExists("./terraform.tfstate")) {
-                sh "rm -rf .terraform/"
-                sh "rm -rf terraform.tfstate"
-                sh "rm -rf terraform.tfstate.backup"
-                sh "rm -rf plan.out"
+    dir('terraform') {
+        // Output Terraform version
+        sh "terraform --version"
 
-            }
-            
-            if (fileExists("status")) {
-                sh "rm status"
-            }
+        //Remove the terraform state file so we always start from a clean state
+        if (fileExists("./terraform.tfstate")) {
+            sh "rm -rf .terraform/"
+            sh "rm -rf terraform.tfstate"
+            sh "rm -rf terraform.tfstate.backup"
+            sh "rm -rf plan.out"
+        }
 
-            sh "set +e; terraform plan -var-file=jenkins.tfvars -var region=$Region -var identifier=$Environment_Identifier -var ad=$Availability_Domain -out=plan.out -detailed-exitcode; echo \$? > status"
+        if (fileExists("status")) {
+            sh "rm status"
+        }
 
-       
-            def exitCode = readFile('status').trim()
-            def apply = false
-            
-            echo "Terraform Plan Exit Code: ${exitCode}"
-            if (exitCode == "0") {
-                currentBuild.result = 'SUCCESS'
-            }
-            
-            if (exitCode == "1") {
-                 currentBuild.result = 'FAILURE'
-            }
-            
-            if (exitCode == "2") {
-                try {
-                    apply = true
-                } catch (err) {
-                    apply = false
-                    currentBuild.result = 'UNSTABLE'
-                }
-            }
+        sh "set +e; terraform plan -var-file=jenkins.tfvars -var region=$Region -var identifier=$Environment_Identifier -var ad=$Availability_Domain -out=plan.out -detailed-exitcode; echo \$? > status"
 
-            if (apply) {
-                stage name: 'Apply', concurrency: 1
-                
-                if (fileExists("status.apply")) {
-                    sh "rm status.apply"
-                }
-                
-                echo "Apply"
-                
-                sh 'set +e; terraform apply plan.out; echo \$? > status.apply'
-                
-                def applyExitCode = readFile('status.apply').trim()
-                if (applyExitCode == "0") {
-                    sh "bmcs os bucket create -ns verizonwireline --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaasd7w6fhgo3txq3aqy6ehhumhzbybc442cphobl5i7lgmv7gtexga"
-                    sh "bmcs os object put -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
-                } else {
-                    currentBuild.result = 'FAILURE'
-                }
+
+        def exitCode = readFile('status').trim()
+        def apply = false
+
+        echo "Terraform Plan Exit Code: ${exitCode}"
+        if (exitCode == "0") {
+            currentBuild.result = 'SUCCESS'
+        }
+
+        if (exitCode == "1") {
+             currentBuild.result = 'FAILURE'
+        }
+
+        if (exitCode == "2") {
+            try {
+                apply = true
+            } catch (err) {
+                apply = false
+                currentBuild.result = 'UNSTABLE'
             }
         }
 
+        if (apply) {
+            stage name: 'Apply', concurrency: 1
+
+            if (fileExists("status.apply")) {
+                sh "rm status.apply"
+            }
+
+            echo "Apply"
+
+            sh 'set +e; terraform apply plan.out; echo \$? > status.apply'
+
+            def applyExitCode = readFile('status.apply').trim()
+            if (applyExitCode == "0") {
+                sh "bmcs os bucket create -ns verizonwireline --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaasd7w6fhgo3txq3aqy6ehhumhzbybc442cphobl5i7lgmv7gtexga"
+                sh "bmcs os object put -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+            } else {
+                currentBuild.result = 'FAILURE'
+            }
+        }
     }
+
 }

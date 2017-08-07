@@ -5,27 +5,23 @@ node {
     // Get some code from a GitHub repository
     git credentialsId: 'GitHub', url: 'https://eshneken@github.com/eshneken/terraform-bmcs-weblogic-jenkins-chef.git'
 
-    wrap([$class: 'AnsiColorBuildWrapper']) {
- 
-            // Mark the code build 'plan'....
-            stage name: 'Destroy', concurrency: 1
-            dir('terraform') {
-
-            //Remove the terraform state file so we always start from a clean state
-            if (fileExists("./terraform.tfstate")) {
-                sh "rm -rf .terraform/"
-            }
-            if (fileExists("status")) {
-                sh "rm status"
-            }
-            sh "bmcs os object get -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
-            sh "terraform get"
-            sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=jenkins.tfvars"
-            
-            sh "bmcs os object delete -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --force"
-            sh "bmcs os bucket delete -ns verizonwireline --name $Environment_Identifier --force"
-            currentBuild.result = 'SUCCESS'   
-            }
-           
+    // Mark the code build 'plan'....
+    stage name: 'Destroy', concurrency: 1
+    dir('terraform') {
+        //Remove the terraform state file so we always start from a clean state
+        if (fileExists("./terraform.tfstate")) {
+            sh "rm -rf .terraform/"
         }
+        if (fileExists("status")) {
+            sh "rm status"
+        }
+        sh "bmcs os object get -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+        sh "terraform get"
+        sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=jenkins.tfvars"
+
+        sh "bmcs os object delete -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --force"
+        sh "bmcs os bucket delete -ns verizonwireline --name $Environment_Identifier --force"
+        currentBuild.result = 'SUCCESS'   
+        }
+           
     }

@@ -7,6 +7,9 @@ region                          = "us-ashburn-1"
 private_key_path                = "./userdata/eshneken-bmcs.pem"
 ssh_public_key_path             = "./userdata/eshneken-opc.pub"
 ssh_private_key_path            = "./userdata/eshneken-opc"
+
 docker_registry_location_path   = "./userdata/docker_registry_ip_and_port.cfg"
+
+chef_server_url                 = "https://api.chef.io/organizations/eshneken"
 chef_username                   = "eshneken"
 chef_private_key                = "./userdata/eshneken-chef-io.pem"
