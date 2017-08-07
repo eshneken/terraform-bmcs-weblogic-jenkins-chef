@@ -5,4 +5,4 @@
 *.pub
 *.cfg
 eshneken-opc*
-*/syntaxcache/*
+/chef/.chef/syntaxcache/*
