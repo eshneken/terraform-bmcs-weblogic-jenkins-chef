@@ -78,10 +78,10 @@ scp -r -i ~/Keys/eshneken-opc userdata opc@129.213.60.3:/home/opc
 ```
 
 #### Install Terraform & BMCS Provider
-Install Terraform binary and BMCS provider by following the [instructions here](https://github.com/oracle/terraform-provider-baremetal)
+Install Terraform binary and BMCS provider by following the [instructions here](https://github.com/oracle/terraform-provider-baremetal).  Make sure to put the Terraform binaries in the OPC user home directory.
 
 #### Install BMCS Command Line Interface (CLI)
-Install the BMCS CLI by following the [instructions here](https://docs.us-phoenix-1.oraclecloud.com/Content/API/SDKDocs/cli.htm)
+Install the BMCS CLI by following the [instructions here](https://docs.us-phoenix-1.oraclecloud.com/Content/API/SDKDocs/cli.htm).  Make sure to put the BMCS provider plugin in the OPC user home directory.
 
 ### Populate the Docker Registry
 Now that you have a private registry configured in the cloud, you want to put an image into it that can be pulled by Chef during environment configuration.  In a real workflow this can be pushed as part of a CI/CD flow but for this sample we assumed a base Weblogic 12.2.1.2 image pulled from the Docker Store.
