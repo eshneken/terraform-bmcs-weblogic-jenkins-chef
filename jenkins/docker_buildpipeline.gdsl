@@ -14,6 +14,7 @@ node {
         sh "PATH=$PATH:/home/opc:.; export PATH"
         
         // Output Terraform version
+        sh "terraform init"
         sh "terraform --version"
 
         //Remove the terraform state file so we always start from a clean state
