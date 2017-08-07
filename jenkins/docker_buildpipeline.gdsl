@@ -10,6 +10,9 @@ node {
     stage name: 'Plan', concurrency: 1
 
     dir('terraform') {
+    
+        sh "PATH=$PATH:/home/opc:.; export PATH"
+        
         // Output Terraform version
         sh "terraform --version"
 
