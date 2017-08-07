@@ -11,7 +11,7 @@ node {
 
     dir('terraform') {
     
-        sh "cp /home/opc/terraform ."
+        sh "cp -R /home/opc/terraform/userdata ."
         sh "cp /home/opc/terraform-provider-baremetal ."
         
         // Output Terraform version
