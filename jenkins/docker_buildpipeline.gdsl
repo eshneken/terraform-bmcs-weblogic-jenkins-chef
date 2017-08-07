@@ -11,7 +11,10 @@ node {
 
     dir('terraform') {
     
-        sh "cp -R /home/opc/terraform/userdata ."
+        // copy userdata from home and setup the terraform binaries and providers
+        sh "rm -rf ./userdata"
+        sh "cp -R /home/opc/userdata ."
+        sh "sudo ln -s /home/opc/terraform /usr/local/bin/terraform"
         sh "cp /home/opc/terraform-provider-baremetal ."
         
         // Output Terraform version
