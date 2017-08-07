@@ -1,0 +1,8 @@
+*.terraform*
+*.tfstate*
+*.key
+*.pem
+*.pub
+*.cfg
+eshneken-opc*
+*/syntaxcache/*
