@@ -8,9 +8,7 @@ node {
     // Mark the code build 'plan'....
     stage name: 'Destroy', concurrency: 1
     dir('terraform') {
-        // initialize the terraform environment
-        sh "terraform init"
-        
+    
         // copy userdata from home and setup the terraform binaries and providers
         sh "rm -rf ./userdata"
         sh "cp -R /home/opc/userdata ."
@@ -31,6 +29,7 @@ node {
         sh "terraform get"
         
         // direct terraform to destroy the environment
+        sh "terraform init"
         sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=jenkins.tfvars"
 
         // clean up object storage
