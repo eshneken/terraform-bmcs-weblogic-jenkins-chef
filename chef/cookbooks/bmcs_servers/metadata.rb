@@ -4,7 +4,7 @@ maintainer_email 'ed.shnekendorf@oracle.com'
 license 'All Rights Reserved'
 description 'Installs/Configures Oracle BMCS Server'
 long_description 'Installs/Configures Oracle BMCS Servers'
-version '0.2.6'
+version '0.2.7'
 chef_version '>= 12.1' if respond_to?(:chef_version)
 
 depends 'docker', '~> 2.0'
