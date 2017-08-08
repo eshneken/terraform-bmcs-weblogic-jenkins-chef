@@ -36,6 +36,7 @@ node {
         sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=current_run.tfvars"
 
         // clean up object storage
+        sh "bmcs os object delete -ns verizonwireline -bn $Environment_Identifier --name current_state.tfvars --force"
         sh "bmcs os object delete -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --force"
         sh "bmcs os bucket delete -ns verizonwireline --name $Environment_Identifier --force"
         
