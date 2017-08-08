@@ -36,10 +36,9 @@ node {
         }
         
         sh "cp jenkins.tfvars current_run.tfvars"
-        sh "echo region=$Region >> current_run.tfvars"
-        sh "echo region=$Region >> current_run.tfvars"
-        sh "echo identifier=$Environment_Identifier >> current_run.tfvars"
-        sh "echo ad=$Availability_Domain >> current_run.tfvars"
+        sh "echo region = \"$Region\" >> current_run.tfvars"
+        sh "echo identifier = \"$Environment_Identifier\"  >> current_run.tfvars"
+        sh "echo ad = \"$Availability_Domain\"  >> current_run.tfvars"
 
         // Init Terraform
         sh "terraform init"
