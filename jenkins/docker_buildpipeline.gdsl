@@ -33,12 +33,13 @@ node {
         // remove the working variables file and re-write for this run
         if (fileExists("current_run.tfvars")) {
             sh "rm current_run.tfvars"
-            sh "cp jenkins.tfvars current_run.tfvars"
-            sh "echo region=$Region >> current_run.tfvars"
-            sh "echo region=$Region >> current_run.tfvars"
-            sh "echo identifier=$Environment_Identifier >> current_run.tfvars"
-            sh "echo ad=$Availability_Domain >> current_run.tfvars"
         }
+        
+        sh "cp jenkins.tfvars current_run.tfvars"
+        sh "echo region=$Region >> current_run.tfvars"
+        sh "echo region=$Region >> current_run.tfvars"
+        sh "echo identifier=$Environment_Identifier >> current_run.tfvars"
+        sh "echo ad=$Availability_Domain >> current_run.tfvars"
 
         // Init Terraform
         sh "terraform init"
