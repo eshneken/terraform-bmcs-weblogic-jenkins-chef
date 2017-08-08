@@ -29,13 +29,23 @@ node {
         if (fileExists("status")) {
             sh "rm status"
         }
+        
+        // remove the working variables file and re-write for this run
+        if (fileExists("current_run.tfvars")) {
+            sh "rm current_run.tfvars"
+            sh "cp jenkins.tfvars current_run.tfvars"
+            sh "echo region=$Region >> current_run.tfvars"
+            sh "echo region=$Region >> current_run.tfvars"
+            sh "echo identifier=$Environment_Identifier >> current_run.tfvars"
+            sh "echo ad=$Availability_Domain >> current_run.tfvars"
+        }
 
         // Init Terraform
         sh "terraform init"
         sh "terraform --version"
         
         // build the plan
-        sh "set +e; terraform plan -var-file=jenkins.tfvars -var region=$Region -var identifier=$Environment_Identifier -var ad=$Availability_Domain -out=plan.out -detailed-exitcode; echo \$? > status"
+        sh "set +e; terraform plan -var-file=current_run.tfvars -out=plan.out -detailed-exitcode; echo \$? > status"
 
         def exitCode = readFile('status').trim()
         def apply = false
@@ -73,6 +83,7 @@ node {
             if (applyExitCode == "0") {
                 sh "bmcs os bucket create -ns verizonwireline --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaasd7w6fhgo3txq3aqy6ehhumhzbybc442cphobl5i7lgmv7gtexga"
                 sh "bmcs os object put -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+                sh "bmcs os object put -ns verizonwireline -bn $Environment_Identifier --name current_vars.tfvars --file ./current_vars.tfvars"
             } else {
                 currentBuild.result = 'FAILURE'
             }
