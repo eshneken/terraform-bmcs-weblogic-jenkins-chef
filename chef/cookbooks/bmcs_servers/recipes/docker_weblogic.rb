@@ -24,6 +24,6 @@ end
 docker_container 'weblogic' do
     repo container_name
 	tag 'latest'
-	port '7001:7001'
+	port '80:7001'
 	action :run
 end
