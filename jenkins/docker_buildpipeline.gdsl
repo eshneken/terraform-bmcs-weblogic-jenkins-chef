@@ -39,6 +39,7 @@ node {
         sh "sed -i 's/<REGION>/$Region/' current_run.tfvars"
         sh "sed -i 's/<IDENTIFIER>/$Environment_Identifier/' current_run.tfvars"
         sh "sed -i 's/<AD>/$Availability_Domain/' current_run.tfvars"
+        sh "sed -i 's/<DOCKER_APPLICATION_TAG>/$Docker_Application_Tag/' current_run.tfvars"
 
         // Init Terraform
         sh "terraform init"

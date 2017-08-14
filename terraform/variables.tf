@@ -14,6 +14,7 @@ variable "chef_private_key" {}
 variable "region" {default="us-ashburn-1"}
 variable "identifier" {default="local"}
 variable "ad" {default="1"}
+variable "docker_application_tag" {}
 
 variable "VPC-CIDR" {
   default = "10.0.0.0/16"

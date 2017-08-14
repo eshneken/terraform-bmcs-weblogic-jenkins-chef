@@ -17,3 +17,5 @@ chef_private_key                = "./userdata/eshneken-chef-io.pem"
 region                          = "<REGION>"
 identifier                      = "<IDENTIFIER>"
 ad                              = "<AD>"
+
+docker_application_tag          = "<DOCKER_APPLICATION_TAG>"

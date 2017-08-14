@@ -148,7 +148,8 @@ resource "null_resource" "managed_server_instance_config" {
   provisioner "chef"  {
           attributes_json = <<-EOF
             {
-            "docker_registry_ip_and_port" : "${file(var.docker_registry_location_path)}"
+            "docker_registry_ip_and_port" : "${file(var.docker_registry_location_path)}",
+            "docker_application_tag" : "${var.docker_application_tag}"
             }
           EOF
 

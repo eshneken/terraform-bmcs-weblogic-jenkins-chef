@@ -5,7 +5,7 @@ end
 
 # set docker registry from attributes and assign container name
 docker_registry = node['docker_registry_ip_and_port']
-container_name = docker_registry + "/" + node['application_tag']
+container_name = docker_registry + "/" + node['docker_application_tag']
 
 # Start Docker
 docker_service 'default' do
