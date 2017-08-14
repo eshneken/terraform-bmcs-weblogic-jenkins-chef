@@ -6,11 +6,12 @@ This repository provides the code used to demonstrate IaC concepts using Oracle 
 
 To demonstrate, the user needs to set up a Jenkins server (either in Oracle Cloud or on-premises) to act as an orchestrator, a private docker registry (ideally running in BMCS and potentially on the same compute instance as the Jenkins server), and to have a [Hosted Chef](https://chef.io/) account to which the included cookbooks can be uploaded.
 
-The demo flow consists of going to the Jenkins console and triggering an environment deployment.  Doing this will prompt the user to enter 3 parameters:
+The demo flow consists of going to the Jenkins console and triggering an environment deployment.  Doing this will prompt the user to enter 4 parameters:
 
 * An **Environment Identifier** which acts as a unique designator and allows multiple deployments to occur in parallel (e.g. DEV, TEST, SPRINT_5, FEATURE_XYZ, etc)
 * A **Region** which defines which BMCS region is the target
 * An **Availability Domain** which designates which AD of the selected region the infrastructure is deployed to
+* A **Docker Application Tag** which designates which docker image is in the docker repo that should be installed
 
 Upon starting the pipeline, Jenkins will pull all of the IaC assets from GitHub (demonstrating a key aspect of infrastructure as code) and kick off a Terraform process to create a virtual cloud network (VCN) with associated subnet, security list, internet gateway, and routing tables.  Terraform will also provision a compute instance and then trigger a call the hosted Chef server to configure the instance.  Chef will install Docker on the target instance and then pull a Weblogic 12.2.1.2 image from the private Docker registry and install and run it on the compute instance.  The end-result is a fresh software-defined environment provisioned and running Weblogic in a completely automated fashion in about 5 minutes.
 
@@ -138,6 +139,7 @@ Do the following to create the build job:
     * Environment_Identifier, string parameter
     * Region, choice parameter, [us-ashburn-1, us-phoenix-1]
     * Availability_Domain, choice parameter, [1,2,3]
+    * Docker_Application_Tag, string parameter, default=wls_sample_app
 * Under **Pipeline** select **Pipeline script from SCM** 
 * Point the **Repository URL** to your GitHub project (e.g. https://github.com/your_handle/terraform-bmcs-weblogic-jenkins-chef.git) and select the **credentials** you configured from the dropdown
 * For the **Script Path**, type:  jenkins/docker_buildpipeline.gdsl
