@@ -82,9 +82,9 @@ node {
 
             def applyExitCode = readFile('status.apply').trim()
             if (applyExitCode == "0") {
-                sh "oic os bucket create -ns verizonwireline --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaasd7w6fhgo3txq3aqy6ehhumhzbybc442cphobl5i7lgmv7gtexga"
-                sh "oic os object put -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
-                sh "oic os object put -ns verizonwireline -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
+                sh "oci os bucket create -ns verizonwireline --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaasd7w6fhgo3txq3aqy6ehhumhzbybc442cphobl5i7lgmv7gtexga"
+                sh "oci os object put -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+                sh "oci os object put -ns verizonwireline -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
             } else {
                 currentBuild.result = 'FAILURE'
             }
