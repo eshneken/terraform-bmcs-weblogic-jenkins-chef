@@ -14,7 +14,7 @@ node {
         sh "cp -R /home/opc/userdata ."
         sh "sudo rm /usr/local/bin/terraform"
         sh "sudo ln -s /home/opc/terraform /usr/local/bin/terraform"
-        sh "cp /home/opc/terraform-provider-baremetal ."
+        sh "cp /home/opc/terraform-provider-oci ."
         
         //Remove the terraform state file so we always start from a clean state
         if (fileExists("./terraform.tfstate")) {

@@ -1,21 +1,21 @@
-# Infrastructure-as-Code (IaC) with Jenkins, Terraform, Chef, and Weblogic on Oracle Bare Metal Cloud (BMCS)
+# Infrastructure-as-Code (IaC) with Jenkins, Terraform, Chef, and Weblogic on Oracle Cloud Infrastructure (OCI)
 Ed Shnekendorf, Cloud Platform Architect, Oracle
 
 ## Overview
 This repository provides the code used to demonstrate IaC concepts using Oracle Cloud, Jenkins, Terraform, and Chef.
 
-To demonstrate, the user needs to set up a Jenkins server (either in Oracle Cloud or on-premises) to act as an orchestrator, a private docker registry (ideally running in BMCS and potentially on the same compute instance as the Jenkins server), and to have a [Hosted Chef](https://chef.io/) account to which the included cookbooks can be uploaded.
+To demonstrate, the user needs to set up a Jenkins server (either in Oracle Cloud or on-premises) to act as an orchestrator, a private docker registry (ideally running in OCI and potentially on the same compute instance as the Jenkins server), and to have a [Hosted Chef](https://chef.io/) account to which the included cookbooks can be uploaded.
 
 The demo flow consists of going to the Jenkins console and triggering an environment deployment.  Doing this will prompt the user to enter 4 parameters:
 
 * An **Environment Identifier** which acts as a unique designator and allows multiple deployments to occur in parallel (e.g. DEV, TEST, SPRINT_5, FEATURE_XYZ, etc)
-* A **Region** which defines which BMCS region is the target
+* A **Region** which defines which OCI region is the target
 * An **Availability Domain** which designates which AD of the selected region the infrastructure is deployed to
 * A **Docker Application Tag** which designates which docker image is in the docker repo that should be installed
 
 Upon starting the pipeline, Jenkins will pull all of the IaC assets from GitHub (demonstrating a key aspect of infrastructure as code) and kick off a Terraform process to create a virtual cloud network (VCN) with associated subnet, security list, internet gateway, and routing tables.  Terraform will also provision a compute instance and then trigger a call the hosted Chef server to configure the instance.  Chef will install Docker on the target instance and then pull a Weblogic 12.2.1.2 image from the private Docker registry and install and run it on the compute instance.  The end-result is a fresh software-defined environment provisioned and running Weblogic in a completely automated fashion in about 5 minutes.
 
-Jenkins also exposes a destruction pipeline which can be called (using the same Environment Identifier) to destroy the infrastructure.  Calling this flow will remove the compute instance and the software-defined network that was created.  This is accomplished (with concurrency) but leveraging BMCS object storage (behind the scenes) to manage multiple Terraform state files based on the unique identifier.
+Jenkins also exposes a destruction pipeline which can be called (using the same Environment Identifier) to destroy the infrastructure.  Calling this flow will remove the compute instance and the software-defined network that was created.  This is accomplished (with concurrency) but leveraging OCI object storage (behind the scenes) to manage multiple Terraform state files based on the unique identifier.
 
 It is helpful to understand Terraform before modifying this code for your own purposes.  A great resource that I used to learn was this [excellent book](http://www.terraformupandrunning.com/) by Jim Brikman.  It is also important to understand Chef and a great resource is working through the 'Getting Started' and 'Infrastructure Automation' modules of the [Learn Chef Rally](https://learn.chef.io/).
 
@@ -29,7 +29,7 @@ The **chef** directory contains the chef root directory and the cookbook used in
 The **jenkins** directory contains the groovy domain specific language (GDSL) scripts that define the Jenkins pipelines for environment creation and destruction.  The GitHub location of these scripts is used directly in the Jenkins job config (also demonstrating IaC concepts).
 
 ## Environment Setup
-First, make sure that you have an Oracle BMCS account and know all the important things like tenancy OCID, compartment OCID, User OCID, User fingerprint, etc.  
+First, make sure that you have an Oracle OCI account and know all the important things like tenancy OCID, compartment OCID, User OCID, User fingerprint, etc.  
 
 Next, make sure you have visited [Hosted Chef](https://chef.io) and create an account for yourself with an organization.  Alternatively, you can always use a Chef instance that you set up on a local server but this seems silly given the ease of using the hosted version.  
 
@@ -38,7 +38,7 @@ After that, make sure that you've installed the Chef development kit on your loc
 Finally, you probably want to fork this repository since you'll want to make changes in GitHub for your own environment.  Because we're demonstrating IaC principles, Jenkins pulls from a Git repo so you will actually need to make changes in Git to point to your own stuff to make things work
 
 ### Install a Jenkins Server and Private Docker Registry
-I recommend doing this in BMCS (after all, why not?) so create a VCN, make sure your security list allows 8080 (default Jenkins port) & 5000 (docker registry port), and create a compute instance.  Log into that instance and make sure to disable the local firewall; here are the sample commands for OEL/RHEL/CentOS 7:
+I recommend doing this in OCI (after all, why not?) so create a VCN, make sure your security list allows 8080 (default Jenkins port) & 5000 (docker registry port), and create a compute instance.  Log into that instance and make sure to disable the local firewall; here are the sample commands for OEL/RHEL/CentOS 7:
 
 ```css
 sudo service firewalld stop
@@ -78,11 +78,11 @@ Once you've populated your local contents of the **/terraform/userdata** directo
 scp -r -i ~/Keys/eshneken-opc userdata opc@129.213.60.3:/home/opc
 ```
 
-#### Install Terraform & BMCS Provider
-Install Terraform binary and BMCS provider by following the [instructions here](https://github.com/oracle/terraform-provider-baremetal).  Make sure to put the Terraform binaries in the OPC user home directory.
+#### Install Terraform & OCI Provider
+Install Terraform binary and OCI provider by following the [instructions here](https://github.com/oracle/terraform-provider-oci).  Make sure to put the Terraform binaries in the OPC user home directory.
 
-#### Install BMCS Command Line Interface (CLI)
-Install the BMCS CLI by following the [instructions here](https://docs.us-phoenix-1.oraclecloud.com/Content/API/SDKDocs/cli.htm).  Make sure to put the BMCS provider plugin in the OPC user home directory.
+#### Install OCI Command Line Interface (CLI)
+Install the OCI CLI by following the [instructions here](https://docs.us-phoenix-1.oraclecloud.com/Content/API/SDKDocs/cli.htm).  Make sure to put the OCI provider plugin in the OPC user home directory.
 
 ### Populate the Docker Registry
 Now that you have a private registry configured in the cloud, you want to put an image into it that can be pulled by Chef during environment configuration.  In a real workflow this can be pushed as part of a CI/CD flow but for this sample we assumed a base Weblogic 12.2.1.2 image pulled from the Docker Store.
@@ -125,7 +125,7 @@ Start by logging into your Jenkins server (http://<PUBLIC_IP>:8080/jenkins).
 First, set up a credential in the credential store that points to your GitHub account.  Do this by navigating to **Credentials->Jenkins->Global Credentials->Add Credentials** and add a **Username with Password** credential.  Remember, you should have forked my GitHub project so that you can make the appropriate changes in your GDSL files.
 
 #### Update Config Files and Push to GitHub
-Open the **/jenkins/*.gdsl** files and set the **git credentialsId** block to point to your GitHub account.  Also, update all the lines with a **bmcs** CLI call to reference the tenancy name you're using (-ns) and the compartment you have access to (--compartment-id)
+Open the **/jenkins/*.gdsl** files and set the **git credentialsId** block to point to your GitHub account.  Also, update all the lines with a **OCI** CLI call to reference the tenancy name you're using (-ns) and the compartment you have access to (--compartment-id)
 
 Also, open **/terraform/jenkins.tfvars** and update all the settings to be relevant for your environment,
 

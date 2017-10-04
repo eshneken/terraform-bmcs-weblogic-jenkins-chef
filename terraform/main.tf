@@ -1,36 +1,36 @@
 ### Declare full network with single AD and compute instance
 
 # VCN
-resource "baremetal_core_virtual_network" "SingleInstanceVCN" {
+resource "oci_core_virtual_network" "SingleInstanceVCN" {
   cidr_block     = "${var.VPC-CIDR}"
   compartment_id = "${var.compartment_ocid}"
   display_name   = "${var.identifier}-docker-wls"
 }
 
 # Internet Gateway
-resource "baremetal_core_internet_gateway" "SingleInstanceIGW" {
+resource "oci_core_internet_gateway" "SingleInstanceIGW" {
   compartment_id = "${var.compartment_ocid}"
   display_name   = "${var.identifier}-docker-wls-igw"
-  vcn_id         = "${baremetal_core_virtual_network.SingleInstanceVCN.id}"
+  vcn_id         = "${oci_core_virtual_network.SingleInstanceVCN.id}"
 }
 
 # Routing Table
-resource "baremetal_core_route_table" "SingleInstanceRoutingTable" {
+resource "oci_core_route_table" "SingleInstanceRoutingTable" {
   compartment_id = "${var.compartment_ocid}"
-  vcn_id         = "${baremetal_core_virtual_network.SingleInstanceVCN.id}"
+  vcn_id         = "${oci_core_virtual_network.SingleInstanceVCN.id}"
   display_name   = "${var.identifier}-docker-wls-route-table"
 
   route_rules {
     cidr_block        = "0.0.0.0/0"
-    network_entity_id = "${baremetal_core_internet_gateway.SingleInstanceIGW.id}"
+    network_entity_id = "${oci_core_internet_gateway.SingleInstanceIGW.id}"
   }
 }
 
 # Security List
-resource "baremetal_core_security_list" "SingleInstanceSecList" {
+resource "oci_core_security_list" "SingleInstanceSecList" {
   compartment_id = "${var.compartment_ocid}"
   display_name   = "${var.identifier}-docker-wls-seclist"
-  vcn_id         = "${baremetal_core_virtual_network.SingleInstanceVCN.id}"
+  vcn_id         = "${oci_core_virtual_network.SingleInstanceVCN.id}"
 
   egress_security_rules = [{
     protocol    = "6"
@@ -104,43 +104,43 @@ resource "baremetal_core_security_list" "SingleInstanceSecList" {
 }
 
 # Availability Domain
-resource "baremetal_core_subnet" "SingleInstanceAD1" {
-  availability_domain = "${lookup(data.baremetal_identity_availability_domains.ADs.availability_domains[var.ad - 1],"name")}"
+resource "oci_core_subnet" "SingleInstanceAD1" {
+  availability_domain = "${lookup(data.oci_identity_availability_domains.ADs.availability_domains[var.ad - 1],"name")}"
   cidr_block          = "10.0.1.0/24"
   display_name        = "${var.identifier}-docker-wls-ad-1"
   compartment_id      = "${var.compartment_ocid}"
-  vcn_id              = "${baremetal_core_virtual_network.SingleInstanceVCN.id}"
-  route_table_id      = "${baremetal_core_route_table.SingleInstanceRoutingTable.id}"
-  security_list_ids   = ["${baremetal_core_security_list.SingleInstanceSecList.id}"]
-  dhcp_options_id     = "${baremetal_core_virtual_network.SingleInstanceVCN.default_dhcp_options_id}"
+  vcn_id              = "${oci_core_virtual_network.SingleInstanceVCN.id}"
+  route_table_id      = "${oci_core_route_table.SingleInstanceRoutingTable.id}"
+  security_list_ids   = ["${oci_core_security_list.SingleInstanceSecList.id}"]
+  dhcp_options_id     = "${oci_core_virtual_network.SingleInstanceVCN.default_dhcp_options_id}"
 }
 
 # Compute Instance
-resource "baremetal_core_instance" "SingleInstance-Compute-1" {
-  availability_domain = "${lookup(data.baremetal_identity_availability_domains.ADs.availability_domains[var.ad - 1],"name")}"
+resource "oci_core_instance" "SingleInstance-Compute-1" {
+  availability_domain = "${lookup(data.oci_identity_availability_domains.ADs.availability_domains[var.ad - 1],"name")}"
   compartment_id      = "${var.compartment_ocid}"
   display_name        = "${var.identifier}-docker-wls-server"
-  image               = "${lookup(data.baremetal_core_images.OLImageOCID.images[0], "id")}"
+  image               = "${lookup(data.oci_core_images.OLImageOCID.images[0], "id")}"
 
   metadata {
     ssh_authorized_keys = "${file(var.ssh_public_key_path)}"
   }
   shape     = "VM.Standard1.2"
-  subnet_id = "${baremetal_core_subnet.SingleInstanceAD1.id}"
+  subnet_id = "${oci_core_subnet.SingleInstanceAD1.id}"
 }
 
 ### Display Public IP of Instance
 
 # Gets a list of vNIC attachments on the instance
-data "baremetal_core_vnic_attachments" "InstanceVnics" {
+data "oci_core_vnic_attachments" "InstanceVnics" {
 compartment_id = "${var.compartment_ocid}"
-availability_domain = "${lookup(data.baremetal_identity_availability_domains.ADs.availability_domains[var.ad - 1],"name")}"
-instance_id = "${baremetal_core_instance.SingleInstance-Compute-1.id}"
+availability_domain = "${lookup(data.oci_identity_availability_domains.ADs.availability_domains[var.ad - 1],"name")}"
+instance_id = "${oci_core_instance.SingleInstance-Compute-1.id}"
 }
 
 # Gets the OCID of the first (default) vNIC
-data "baremetal_core_vnic" "InstanceVnic" {
-vnic_id = "${lookup(data.baremetal_core_vnic_attachments.InstanceVnics.vnic_attachments[0],"vnic_id")}"
+data "oci_core_vnic" "InstanceVnic" {
+vnic_id = "${lookup(data.oci_core_vnic_attachments.InstanceVnics.vnic_attachments[0],"vnic_id")}"
 }
 
 ### Provision Server with Chef -> Run Weblogic Docker Recipe
@@ -162,7 +162,7 @@ resource "null_resource" "managed_server_instance_config" {
           user_key = "${file(var.chef_private_key)}"
 
           connection {
-            host = "${data.baremetal_core_vnic.InstanceVnic.public_ip_address}"
+            host = "${data.oci_core_vnic.InstanceVnic.public_ip_address}"
             type = "ssh"
             user = "opc"
             private_key = "${file(var.ssh_private_key_path)}"
