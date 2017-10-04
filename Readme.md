@@ -137,7 +137,7 @@ Do the following to create the build job:
 * From dashboard click **New Item**, select **Pipeline**, and give it a name like **Docker-Build_Environment**
 * Click **This Project is Parameterized** and add the following params:
     * Environment_Identifier, string parameter
-    * Region, choice parameter, [us-ashburn-1, us-phoenix-1]
+    * Region, choice parameter, [us-ashburn-1, us-phoenix-1, eu-frankfurt-1]
     * Availability_Domain, choice parameter, [1,2,3]
     * Docker_Application_Tag, string parameter, default=wls_sample_app
 * Under **Pipeline** select **Pipeline script from SCM** 
