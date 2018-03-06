@@ -28,17 +28,17 @@ node {
         }
         
         // grab the appropriate state from object storage
-        sh "oci os object get -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
-        sh "oci os object get -ns verizonwireline -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
+        sh "oci os object get -ns cloud_pursuit_appdev -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+        sh "oci os object get -ns cloud_pursuit_appdev -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
         
         // direct terraform to destroy the environment
         sh "terraform init"
         sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=current_run.tfvars"
 
         // clean up object storage
-        sh "oci os object delete -ns verizonwireline -bn $Environment_Identifier --name current_run.tfvars --force"
-        sh "oci os object delete -ns verizonwireline -bn $Environment_Identifier --name terraform.tfstate --force"
-        sh "oci os bucket delete -ns verizonwireline --name $Environment_Identifier --force"
+        sh "oci os object delete -ns cloud_pursuit_appdev -bn $Environment_Identifier --name current_run.tfvars --force"
+        sh "oci os object delete -ns cloud_pursuit_appdev -bn $Environment_Identifier --name terraform.tfstate --force"
+        sh "oci os bucket delete -ns cloud_pursuit_appdev --name $Environment_Identifier --force"
         
         currentBuild.result = 'SUCCESS'   
         }
