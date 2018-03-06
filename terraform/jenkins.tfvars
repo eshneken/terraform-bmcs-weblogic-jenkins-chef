@@ -1,7 +1,7 @@
 fingerprint                     = "57:20:5d:2b:81:69:2f:06:8a:6c:a2:3a:7a:6d:d3:fd"
-user_ocid                       = "ocid1.user.oc1..aaaaaaaa3i3rdcgaovca6emuxskrvbrbxp5fm4dxz2cawe7rjueegwi7znsa"
-tenancy_ocid                    = "ocid1.tenancy.oc1..aaaaaaaaklhzzyxjzv7thgytb46iq7zgi5sdk37leo3wy55qyisy4j5tbowq"
-compartment_ocid                = "ocid1.compartment.oc1..aaaaaaaasd7w6fhgo3txq3aqy6ehhumhzbybc442cphobl5i7lgmv7gtexga"
+user_ocid                       = "ocid1.user.oc1..aaaaaaaapvqieubwrk7iv62rex3kkyqrlctg2qzomcnsmrlcf2jsnsmne3dq"
+tenancy_ocid                    = "ocid1.tenancy.oc1..aaaaaaaay5hqvxneg5efvaqft7rwjmuk7xpsfjzr23ncxsxmqhr4utsse3ma"
+compartment_ocid                = "ocid1.compartment.oc1..aaaaaaaa5kobe5xkyi5qfobvaocgolsby7b3adwfe5u23xrarjcpu4z6rw2a"
 region                          = "us-ashburn-1"
 
 private_key_path                = "./userdata/eshneken-bmcs.pem"
