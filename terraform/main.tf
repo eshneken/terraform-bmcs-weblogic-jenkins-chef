@@ -157,7 +157,6 @@ resource "null_resource" "managed_server_instance_config" {
           run_list = ["bmcs_servers::docker_weblogic"]
           node_name = "${var.identifier}-docker-wls-server"
           server_url = "${var.chef_server_url}"
-          version = "13.8.5"
           recreate_client = true
           user_name = "${var.chef_username}"
           user_key = "${file(var.chef_private_key)}"
