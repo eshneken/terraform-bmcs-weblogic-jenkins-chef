@@ -125,7 +125,7 @@ resource "oci_core_instance" "SingleInstance-Compute-1" {
   metadata {
     ssh_authorized_keys = "${file(var.ssh_public_key_path)}"
   }
-  shape     = "VM.Standard1.2"
+  shape     = "VM.Standard2.1"
   subnet_id = "${oci_core_subnet.SingleInstanceAD1.id}"
 }
 
