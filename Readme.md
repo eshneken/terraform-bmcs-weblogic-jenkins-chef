@@ -92,6 +92,7 @@ First, navigate to the [Docker Store](https://store.docker.com) in your favorite
 Then, execute the following in your local Docker environment (which should be tied to your DockerHub account thereby enabling you to access items you've regisatered for in the Docker Store):
 
 ```css
+docker login   [make sure to use your docker id, not your email, when logging into docker hub]
 docker pull store/oracle/weblogic:12.2.1.2
 docker tag  store/oracle/weblogic:12.2.1.2 REGISTRY_IP:5000/weblogic-1221
 docker push REGISTRY_IP:5000/weblogic-1221
