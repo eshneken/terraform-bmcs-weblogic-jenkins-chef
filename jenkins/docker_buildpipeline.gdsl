@@ -82,9 +82,9 @@ node {
 
             def applyExitCode = readFile('status.apply').trim()
             if (applyExitCode == "0") {
-                sh "oci os bucket create -ns cloud_pursuit_appdev --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaa5kobe5xkyi5qfobvaocgolsby7b3adwfe5u23xrarjcpu4z6rw2a"
-                sh "oci os object put -ns cloud_pursuit_appdev -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
-                sh "oci os object put -ns cloud_pursuit_appdev -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
+                sh "oci os bucket create -ns orasenatdecaentegacpgut02 --name $Environment_Identifier  --compartment-id ocid1.compartment.oc1..aaaaaaaa5kobe5xkyi5qfobvaocgolsby7b3adwfe5u23xrarjcpu4z6rw2a"
+                sh "oci os object put -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+                sh "oci os object put -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
             } else {
                 currentBuild.result = 'FAILURE'
             }
