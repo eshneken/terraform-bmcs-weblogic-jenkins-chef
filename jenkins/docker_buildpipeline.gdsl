@@ -13,10 +13,10 @@ node {
     
         // copy userdata from home and setup the terraform binaries and providers
         sh "rm -rf ./userdata"
-        sh "cp -R /home/bitnami/userdata ."
+        sh "sudo cp -R /home/bitnami/userdata ."
         sh "sudo rm /usr/local/bin/terraform"
-        sh "sudo ln -s /home/opc/terraform /usr/local/bin/terraform"
-        sh "cp /home/bitnami/terraform-provider-oci ."
+        sh "sudo ln -s /home/bitnami/terraform /usr/local/bin/terraform"
+        sh "sudo cp /home/bitnami/terraform-provider-oci ."
 
         //Remove the terraform state file so we always start from a clean state
         if (fileExists("./terraform.tfstate")) {
