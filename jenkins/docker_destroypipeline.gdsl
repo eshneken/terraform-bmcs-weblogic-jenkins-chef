@@ -11,10 +11,12 @@ node {
     
         // copy userdata from home and setup the terraform binaries and providers
         sh "rm -rf ./userdata"
-        sh "cp -R /home/opc/userdata ."
+        sh "sudo cp -R /home/bitnami/userdata ."
+        sh "sudo chown -R tomcat ./userdata"
+        sh "sudo chgrp -R tomcat ./userdata"
         sh "sudo rm /usr/local/bin/terraform"
-        sh "sudo ln -s /home/opc/terraform /usr/local/bin/terraform"
-        sh "cp /home/opc/terraform-provider-oci ."
+        sh "sudo cp /home/bitnami/terraform /usr/local/bin/terraform"
+        sh "sudo cp /home/bitnami/terraform-provider-oci ."
         
         //Remove the terraform state file so we always start from a clean state
         if (fileExists("./terraform.tfstate")) {
@@ -28,17 +30,17 @@ node {
         }
         
         // grab the appropriate state from object storage
-        sh "oci os object get -ns cloud_pursuit_appdev -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
-        sh "oci os object get -ns cloud_pursuit_appdev -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
+        sh "/home/tomcat/bin/oci os object get -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name terraform.tfstate --file ./terraform.tfstate"
+        sh "/home/tomcat/bin/oci os object get -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name current_run.tfvars --file ./current_run.tfvars"
         
         // direct terraform to destroy the environment
-        sh "terraform init"
-        sh "set +e; terraform destroy -force -state=terraform.tfstate -var-file=current_run.tfvars"
+        sh "/usr/local/bin/terraform init"
+        sh "set +e; /usr/local/bin/terraform destroy -force -state=terraform.tfstate -var-file=current_run.tfvars"
 
         // clean up object storage
-        sh "oci os object delete -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name current_run.tfvars --force"
-        sh "oci os object delete -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name terraform.tfstate --force"
-        sh "oci os bucket delete -ns orasenatdecaentegacpgut02 --name $Environment_Identifier --force"
+        sh "/home/tomcat/bin/oci os object delete -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name current_run.tfvars --force"
+        sh "/home/tomcat/bin/oci os object delete -ns orasenatdecaentegacpgut02 -bn $Environment_Identifier --name terraform.tfstate --force"
+        sh "/home/tomcat/bin/oci os bucket delete -ns orasenatdecaentegacpgut02 --name $Environment_Identifier --force"
         
         currentBuild.result = 'SUCCESS'   
         }
