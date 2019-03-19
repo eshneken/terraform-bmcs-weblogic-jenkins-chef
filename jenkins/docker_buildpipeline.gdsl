@@ -42,11 +42,11 @@ node {
         sh "sed -i 's/<DOCKER_APPLICATION_TAG>/$Docker_Application_Tag/' current_run.tfvars"
 
         // Init Terraform
-        sh "terraform init"
-        sh "terraform --version"
+        sh "/usr/local/bin/terraform init"
+        sh "/usr/local/bin/terraform --version"
         
         // build the plan
-        sh "set +e; terraform plan -var-file=current_run.tfvars -out=plan.out -detailed-exitcode; echo \$? > status"
+        sh "set +e; /usr/local/bin/terraform plan -var-file=current_run.tfvars -out=plan.out -detailed-exitcode; echo \$? > status"
 
         def exitCode = readFile('status').trim()
         def apply = false
@@ -78,7 +78,7 @@ node {
 
             echo "Apply"
 
-            sh 'set +e; terraform apply plan.out; echo \$? > status.apply'
+            sh 'set +e; /usr/local/bin/terraform apply plan.out; echo \$? > status.apply'
 
             def applyExitCode = readFile('status.apply').trim()
             if (applyExitCode == "0") {
